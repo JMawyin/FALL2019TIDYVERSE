@@ -1,9 +1,17 @@
 ---
-title: "Tidyverse Assignment - Masculinity Data"
-author: "Amber Ferger"
-date: "11/28/2019"
+title: "Part 2 - Extending Tidyverse Assignment - Mascuninity Data"
+author: "Amber Ferger, Extended Part 2 - Maryluz Cruz"
+date: "12/8/2019"
 output: html_document
 ---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1 Original Tidyverse Assignment By Amber Ferger
+
 
 ## The Data: What Do Men Think It Means to be a Man?
 For this assignment, I decided to use the dataset that corresponds to the *What Do Men Think It Means To Be A Man?* article on FiveThirtyEight.com. The article can be found here: https://fivethirtyeight.com/features/what-do-men-think-it-means-to-be-a-man/
@@ -11,10 +19,8 @@ For this assignment, I decided to use the dataset that corresponds to the *What 
 It contains the results of a survey of 1,615 adult men conducted by SurveyMonkey in partnership with FiveThirtyEight and WNYC Studios from May 10-22, 2018. 
 
 ``` {r, warning = FALSE, message = FALSE}
-
 library(tidyverse)
 dat <- as_tibble(read.csv('https://raw.githubusercontent.com/amberferger/DATA607_Masculinity/master/raw-responses.csv'))
-
 ```
 
 
@@ -22,11 +28,9 @@ We have quite a bit of questions in this survey, so we will focus on just a few.
 
 
 ``` {r}
-
 dat <- dat %>% 
   select(race2,orientation, q0002) %>%
   filter(q0002 != 'No answer' & race2 != 'No answer' & orientation != 'No answer')
-
 ```
 
 
@@ -34,58 +38,25 @@ dat <- dat %>%
 
 Our final data set has 1 response variable (the answer to the question) and 2 explanatory variables (our demographic data). We'll use the **group_by** function with the **count()** function to summarize our data. We will then transform our values by creating a percent for each of the of the groupings.
 ``` {r}
-
 raceCount <- dat %>% 
   group_by(race2, q0002) %>%
   count()
-
 raceCount <- raceCount %>% 
   group_by(race2) %>%
   mutate(RACE_PCT = n/sum(n))
-
 raceCount
-
 ```
 
-We can take these numbers and run them through the **summarise** function to get useful data points for later evaluation. 
-
-* Note - adding () around your entire code section will have R display the results.  This is useful if you are working with small dataframes.   
-
-```{r}
-(raceSum<-
-raceCount %>%
-  group_by(race2)%>%
-    summarise(median = median(RACE_PCT), mean = mean(RACE_PCT), sd = sd(RACE_PCT)))
-```
-  
 We'll do the same thing for the **orientation** variable. 
-  
-``` {r}
 
+``` {r}
 orientationCount <- dat %>% 
   group_by(orientation, q0002) %>%
   count()
-
 orientationCount <- orientationCount %>% 
   group_by(orientation) %>%
   mutate(ORIENTATION_PCT = n/sum(n))
-
 orientationCount
-
-```
-  
-Performing the same summarise function for the **orientation** variable.
-  
-```{r}
-(orientationSum<-
-orientationCount %>%
-  group_by(orientation)%>%
-    summarise(median = median(ORIENTATION_PCT), mean = mean(ORIENTATION_PCT), sd = sd(ORIENTATION_PCT)))
-
-(q0002orientationsum <-
-  orientationCount %>%
-    group_by(q0002)%>%
-      summarise(median = median(ORIENTATION_PCT), mean = mean(ORIENTATION_PCT), sd = sd(ORIENTATION_PCT)))
 ```
 
 
@@ -95,39 +66,77 @@ Now let's visualize our data! We'll use the **ggplot** library to take a look:
 
 ``` {r}
 library(ggplot2)
-
 ggplot(raceCount, aes(fill=race2, y=RACE_PCT, x=q0002)) + 
     geom_bar(position="dodge", stat="identity") +
     ggtitle("Race vs Answer")
-
 ```
 
 
 ``` {r}
-
 ggplot(orientationCount, aes(fill=orientation, y=ORIENTATION_PCT, x=q0002)) + 
     geom_bar(position="dodge", stat="identity") +
     ggtitle("Orientation vs Answer")
-
 ```
+
+
+
+## Part 2 Extension of Masculinity Report By Maryluz Cruz 
+
+
+
+### Using readr to read in the csv
+- When using readr, you don't have to worry ablout including stringASfactors=FALSE 
+```{r}
+dat1<- as_tibble(read_csv('https://raw.githubusercontent.com/amberferger/DATA607_Masculinity/master/raw-responses.csv'))
+```
+
+#### For this Part I will have a more in depth look on race ethnicity, age of the participants and whether or not they have kids. 
+
+- Going by Amber's original data I will use select and filter to get the columns and the responses that I want. For this I want the race ethnicity, the age, and kids. 
+```{r}
+dat1 <- dat1 %>% 
+  select(racethn4,age3, kids) %>%
+  filter(racethn4 != 'No answer' & age3 != 'No answer' & kids != 'No answer')
+dat1
+```
+
+#### Here we will calculate on the percentage on whether or not they have children based on ethnicity 
+
+``` {r}
+kidsCount <- dat1 %>% 
+  group_by(kids, racethn4) %>%
+  count()
+kidsCount <- kidsCount %>% 
+  group_by(kids) %>%
+  mutate(Kids_PCT = n/sum(n))
+kidsCount
+```
+
+#### Visualization
+
+``` {r}
+ggplot(kidsCount, aes(fill=racethn4, y=Kids_PCT, x=racethn4)) + 
+    geom_bar(position="dodge", stat="identity") +
+    ggtitle("Kids vs Answer")
+```
+
+#### Here the age of the participants based on ethnicity 
 
 ```{r}
-library(RColorBrewer)
 
-ggplot(orientationCount, aes(x=orientation, y=ORIENTATION_PCT, color=orientation)) +
-    geom_boxplot()+
-    ggtitle(label = "Orientation percentage")+
-  scale_fill_brewer(palette="Set3")
- 
-ggplot(orientationCount, aes(x=q0002, y=ORIENTATION_PCT, color=orientation)) +
-    geom_boxplot()+
-    ggtitle(label = "Question 2 by orientation")+
-  scale_fill_brewer(palette="Set3")
- 
+ageCount <- dat1 %>% 
+  group_by(age3, racethn4) %>%
+  count()
+ageCount <- ageCount %>% 
+  group_by(age3) %>%
+  mutate(Age_PCT = n/sum(n))
+ageCount
 ```
-additional sections added by John Kellogg include lines:
 
-* 49-59
-* 66-73
-* 114-127
+#### Visualization
 
+``` {r}
+ggplot(ageCount, aes(fill=age3, y=Age_PCT, x=racethn4)) + 
+    geom_bar(position="dodge", stat="identity") +
+    ggtitle("Age vs Answer")
+```
