@@ -5,6 +5,7 @@ date: "12/8/2019"
 output:
   html_document: default
   pdf_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -110,3 +111,4 @@ ggplot(my_data, aes(x = type_of_hit, y = exit_velocity, fill=type_of_hit)) +
    geom_boxplot() +
    ggtitle("Boxplot: baseball exit velocity")
 ```
+We can observe that line hits have the fastest average velocity as well as the fastest max velocity for our dataset.
