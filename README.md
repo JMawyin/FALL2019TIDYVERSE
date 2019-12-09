@@ -292,15 +292,15 @@ The data contains mainly categorical variables, some of which are ordinal.
 When loading the data, some work is needed to get these items properly loaded as factors, which will be displayed in the logical sequence for the ordinal items.  This requires recoding and releveling the variables, using functions available in forcats.
 
 ## Tidyverse functions used:
-readr::read_csv()
-readr::spec_csv()
-dplyr::bind_cols()
-dplyr::rename_all()
-forcats::fct_count()
-forcats::fct_recode()
-forcats::fct_relevel()
+
+* readr::read_csv()
+* readr::spec_csv()
+* dplyr::bind_cols()
+* dplyr::rename_all()
+* forcats::fct_count()
+* forcats::fct_recode()
+* forcats::fct_relevel()
 
 ## Part 2
 
 I appended a colorful boxplot to the end of "Tidyverse for Foul Ball data"" (Harris Dupre), which is described immediately above.
-
