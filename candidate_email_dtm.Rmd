@@ -91,7 +91,22 @@ for (candidate in candidates) {
 ```
 
 ## Data cleaning
-This would be a suitable place for cleaning data. For example, removal of HTML tags from the emails may be appropriate, but is omitted from this illustration.
+This is a suitable place for cleaning data. For example, removal of HTML tags and style declarations from the emails may be appropriate depending on the training strategy.
+
+
+```{r}
+glimpse(email_df)  
+
+email_df$email <- email_df$email %>%
+  str_replace_all(.,'[\\n\\s]{2,}','') %>% # Remove more than one common whitespace
+  str_replace_all(.,'="[^"]*?"','') %>% # Remove quotes following a =, common to inline meta or style data
+  str_replace_all(., '<style>.*?style>','') %>% # Remove style tag content
+  str_replace_all(., '</?[^>]+>','') %>% # Remove html tags
+  str_replace_all(.,'\\/\\*.*?\\*\\/','') %>% # Remove css comment text
+  str_replace_all(.,'[^{]{2,40}\\{[^\\}]*?\\}','') # Remove css declarations
+
+email_df$email[1]
+```
 
 ## Tokenize
 ### Tidy tools
@@ -165,14 +180,15 @@ The DTM produced with Tidy tools is usable by other, non-Tidyverse packages, suc
 # Print
 dim(email_dtm)
 email_dtm
-inspect(email_dtm[101:105, 101:105])
+inspect(email_dtm[51:55, 51:55])
 
 # Remove some sparse terms and review again
 email_dtm_rm_sparse <- removeSparseTerms(email_dtm, 0.8)
 dim(email_dtm_rm_sparse)
 email_dtm_rm_sparse
-inspect(email_dtm_rm_sparse[101:105, 101:105])
+inspect(email_dtm_rm_sparse[51:55, 51:55])
 ```
+
 
 ## Conclusion
 The Tidyverse is a powerful resource for preparation of text data in a text mining workflow.
