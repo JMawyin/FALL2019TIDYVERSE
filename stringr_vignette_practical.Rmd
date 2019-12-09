@@ -1,0 +1,238 @@
+---
+title: "tidyverse 1: stringr practical Vignette"
+author: "T Jenkins"
+date: "12/08/2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tidyverse 1: stringr practical Vignette}
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+
+---
+
+```{r, include = FALSE}
+library(stringr)
+knitr::opts_chunk$set(
+  comment = "#>", 
+  collapse = TRUE
+)
+```
+
+
+# Tidyverse 1: stringr practical Vignette
+
+At first R might seem like it is largely focused on numeric data and graphs, so investigating its text processing capabilities can take some research. Fortunately, we find that (tidyverse)[https://tidyverse.org/] (and its family of other compatible libraries that are built to work with its philosophy and grammar) has very well ordered string operations as outlined in a number of libraries. Formost in text processing through the tidyverse is the library, (stringr)[https://stringr.tidyverse.org/]. 
+
+We write a practical vignette with the practical use-cases in mind:
+
+- The most basic tidyverse string processing library is stringr, which simplifies a number of string operations.
+- Regular expressions in R function very much like those of other languages and stringr is built to work with these.
+- Text processing challenges tend to be universal and for this reason can benefit from a more universal explanation.
+- The stringr vigettes are outlined in a functional way, but text processing is not always thought about in a functional, and tends to arise in recipes (see [textrecipes](https://www.tidyverse.org/blog/2018/12/textrecipes-0-0-1/)) based on real-world use cases. 
+
+
+```{r packages, message=FALSE}
+library(tidyverse)  # collection of libraries controlling R functionality
+library(dplyr)    # included in tidyverse, but added here explicity
+library(stringr)    # included in tidyverse, but added here explicity
+library(readr)      # included in tidyverse, but added here explicity
+library(tidytext)   # advanced text processing
+```
+
+## Data
+
+### Quora Question Pairs Dataset
+
+Quora's first public dataset is related to the problem of identifying duplicate questions. At Quora, an important product principle is that there should be a single question page for each logically distinct question. For example, the queries “What is the most populous state in the USA?” and “Which state in the United States has the most people?” should not exist separately on Quora because the intent behind both is identical. Having a canonical page for each logically distinct query makes knowledge-sharing more efficient in many ways: for example, knowledge seekers can access all the answers to a question in a single location, and writers can reach a larger readership than if that audience was divided amongst several pages.
+
+The dataset is based on actual data from Quora and will give anyone the opportunity to train and test models of semantic equivalence.
+
+[From the DataSet Kaggle Homepage](https://www.kaggle.com/quora/question-pairs-dataset)
+
+
+### Data Resrouces for this vignette
+
+To reduce the memory used by this dataset, we've made a sample available at:
+
+* ('https://raw.githubusercontent.com/tj924/msds_data_607/master/vignettes/data/questions_sample.csv')['https://raw.githubusercontent.com/tj924/msds_data_607/master/vignettes/data/questions_sample.csv']
+
+The full dataset may be accessed at the same github repo
+
+* ('https://raw.githubusercontent.com/tj924/msds_data_607/master/vignettes/data/questions.csv')['https://raw.githubusercontent.com/tj924/msds_data_607/master/vignettes/data/questions.csv']
+
+or more properly at the dataset kaggle page:
+
+* (https://www.kaggle.com/quora/question-pairs-dataset)[https://www.kaggle.com/quora/question-pairs-dataset]
+
+or through the Kaggle API, which we do not include details for here:
+
+* (https://www.kaggle.com/docs/api)[https://www.kaggle.com/docs/api]
+
+
+### Data ingestion
+
+We use (readr)[https://readr.tidyverse.org/], a library in tidyverse, to pull in the questions. 
+
+```{r}
+# File uploaded to github for access
+questions_file <- 'https://raw.githubusercontent.com/tj924/msds_data_607/master/vignettes/data/questions_sample.csv'
+questions <- readr::read_csv(questions_file)
+glimpse(questions)
+```
+
+### Data extraction
+
+We extract two examples from our dataset and verify that we are working with a character class as outlined in our glimpse above. 
+
+```{r}
+set.seed(12)
+
+df <- questions %>% sample_n(2)
+
+df 
+
+df$question1[1] %>% cat(.,typeof(.))
+
+```
+
+## Character classes
+
+We inject some additional text to make the samples more realistic in terms of content from the wbe we may need to prepocess. Our injected text sample contains irregular characters (punctuation) such as > and “ as well as numbers as in h1, non-ASCII characters like ₩, and phonetic markers on Latin text such as é.  
+
+### str_c
+str_c works nicely to concatenate our strings into one. 
+
+```{r}
+df <- df %>% mutate(text=stringr::str_c('<h1>',question1,'           </h1>- ®René'))
+df$ambigious_text=100
+
+```
+
+Let's check to see if there are any characters outside of the ASCII character range in question1 with str_extract:
+
+```{r}
+non_ascii <- questions$question1 %>% stringr::str_extract(., '[^\x20-\x7E]') %>% as_tibble() %>% filter(!is.na(.))
+head(non_ascii,1)
+```
+
+Let's perform some other basic functions
+
+```{r}
+str_length(df$question1[1])
+str_subset(df$question1[1], "[aeiou]") 
+str_count(df$question1[1], "[aeiou]")
+ 
+```
+
+
+But more often than not, we will find it in a data frame or other structure, and in this case we want to make sure each observation (row) of data is in the proper format for string operations, and if not, convert it. 
+
+```{r}
+class(df) 
+class(df$text) 
+glimpse(df) 
+ 
+df$ambigious_text <- as.character(df$ambigious_text)
+# In more complex cases we can use tidyverse friends: dplyr, magrittr
+df <- df  %>% rowwise() %>% mutate(ambigious_text=as.character(ambigious_text))
+glimpse(df)
+```
+
+## Character encodings 
+Text in need of pre-processing can be messy. 
+
+We may find that the source (or a previous function) has mixed character encodings. While there are many techniques to find and convert character encodings to UTF-8, the most universal format in use, that is for a larger vignette. The most common cases, merely include filtering a few characters from what is mostly readable text. For this a hex-based search can be used to delete characters not falling within the range of regular printable ASCII encodings. 
+
+```{r}
+ex <- non_ascii$value[1]
+ex
+str_replace(ex,'[^\x20-\x7E]', '')
+```
+
+Other simple use cases include if want to find all instances of the word René in a document, but realize that some of our documents use the non-accented version of the word Rene. For this we can use the tidyverse grammar and the base R library for character conversion iconv to convert all accented characters to their non-accented versions. 
+
+```{r}
+df_pre <- df
+df
+df <- df %>% mutate(text=iconv(text, to='ASCII//TRANSLIT'))
+cat("\nBefore:\n", str_extract(df_pre$text,'.ene'),"\nAfter:\n", str_extract(df$text,'.ene'))
+```
+
+A number of useful libraries break down when it comes to processing multilingual text in a regular way. While a great deal of effort has gone into these libraries results can challenge even experts. It is thus important to decide early in a project whether to invest time in preserving multilingual text. The most important understanding required for working with these libraries i that each character is actually represented in a number of different encoding formats, which each library often works with and recognizes in different ways. For this reason source document creators go to great lengths to standardize their character encodings. 
+
+For a bit more information see:
+
+https://r4ds.had.co.nz/strings.html
+
+https://www.w3.org/International/questions/qa-what-is-encoding
+
+
+When choosing a regular expression replacement or stripping function from the stringr, tidyverse grammars (dplyr for instance), or any library, it is often best to go with the simplest function. These tend to be faster, (sometimes older) better optimized, and tend to use less memory than more complex functions. This can be important when operating over every character in large text blocks and corporas. Sometimes, however, this is not the case. It may be more convenient to use a tidyverse grammar, in which case you can modify your code to iterate slowly, lazily, or use some other method to allow processing to occur. It may also be the case that the library you choose has been optimized to process text in a specific way. Read the release notes to inform yourself of these changes, or benchmark your code. 
+
+Some other common, simple text processing use cases follow:
+
+Convert to lowercase
+```{r}
+
+df <- data.frame(text="<h1>Do ghost actually exists?           </h1>- ®René", "<h1>Does Bernie Sanders still have a chance to become elected?")
+df %>%mutate(text=str_to_lower(text))
+```
+
+Replace any word with a digit
+```{r}
+df %>%mutate(text=str_replace_all(text,'\\w*\\d\\w*','')) 
+```
+
+Replace any word in a list
+```{r}
+df %>% mutate(text=str_replace_all(text,'\\b(hid*|rene)\\b','')) 
+```
+
+Remove excess leading, trailing and intermediate spaces
+```{r}
+df %>%mutate_if(is.character, str_squish)
+```
+
+For more on stringr, see the documentation at (https://stringr.tidyverse.org/)[https://stringr.tidyverse.org/] where the following is outlined:
+
+The four main families of functions in stringr: 
+
+1.  Character manipulation: these functions allow you to manipulate 
+    individual characters within the strings in character vectors.
+   
+1.  Whitespace tools to add, remove, and manipulate whitespace.
+
+1.  Locale sensitive operations whose operations will vary from locale
+    to locale.
+    
+1.  Pattern matching functions. These recognise four engines of
+    pattern description. The most common is regular expressions, but there
+    are three other tools.
+
+The seven main verbs that work with patterns.
+str_detect, str_count, str_subset, str_locate, str_extract, str_match, str_replace, str_split 
+
+
+The regular expressions (the default) and three other pattern matching engines:
+
+fixed(): match exact bytes
+coll(): match human letters
+boundary(): match boundaries
+
+
+```
+## References:
+
+ 
+- https://www.regular-expressions.info/tutorial.html 
+- https://stringr.tidyverse.org/articles/regular-expressions.html 
+- https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html 
+- https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html 
+- https://www.tidytextmining.com/ 
+- https://juliasilge.com/blog/gobbledygook/ 
+- https://github.com/juliasilge/tidytext/blob/master/vignettes/tidytext.Rmd 
+- https://csgillespie.github.io/efficientR/dplyr.html 
+- https://r4ds.had.co.nz/strings.html 
+- https://cloud.r-project.org/web/packages/hunspell/vignettes/intro.html
+
+
