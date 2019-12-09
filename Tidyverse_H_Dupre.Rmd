@@ -2,6 +2,9 @@
 title: "Tidyverse_Foul_Balls"
 author: "Harris Dupre"
 date: "12/8/2019"
+output:
+  html_document: default
+  pdf_document: default
 output: html_document
 ---
 
@@ -95,4 +98,17 @@ ggplot(analysis_df, aes(x=type_of_hit,y = max)) +
 
 #
 
+We can observe that line hits have the fastest average velocity as well as the fastest max velocity for our dataset.
+
+***
+\newpage
+### Tidyverse Part 2 enhancement - Michael Y.
+
+#### Below is a boxplot which illustrates not only the Max exit velocity of various types of foul balls, but also the median, interquartile range, minimum, and outliers.
+
+```{r boxplot}
+ggplot(my_data, aes(x = type_of_hit, y = exit_velocity, fill=type_of_hit)) +
+   geom_boxplot() +
+   ggtitle("Boxplot: baseball exit velocity")
+```
 We can observe that line hits have the fastest average velocity as well as the fastest max velocity for our dataset.
