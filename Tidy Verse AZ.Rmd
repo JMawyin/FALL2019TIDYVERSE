@@ -66,3 +66,75 @@ aes(x=Drug, y=Percent, fill=Age)) + geom_bar(stat="identity", position=position_
 young_adults
 ```
 
+#### Extended (Harris Dupre)
+
+I will extend the above analyses to more age groups, and compare the frequency of drug use across all age groups.
+
+### Adults 26-49
+
+```{r adult 26-49, include=TRUE}
+adults_26_49 <- ggplot(subset(drug_filter, Age %in% c("26-29","30-34","35-49")), 
+aes(x=Drug, y=Percent, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+adults_26_49
+```
+
+### Adults 50-65+
+
+```{r adult 49-65+, include=TRUE}
+adults_50_65 <- ggplot(subset(drug_filter, Age %in% c("50-64","65+")), 
+aes(x=Drug, y=Percent, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+adults_50_65
+```
+
+### Frequency Transform and Analysis Across all Age Groups
+#### *Frequency in this context refers to the median frequency of drug usage across an age group for the past 12 months.
+
+```{r, include=TRUE}
+drug_filter_freq <- filter(drug_separate, Usage=='frequency')
+names (drug_filter_freq) <- c("Age", "Size", "Drug", "Usage", "Frequency")
+```
+
+### Teens (Frequency)
+
+```{r teen_freq, include=TRUE}
+library(ggplot2)
+teen_freq <- ggplot(subset(drug_filter_freq, Age %in% c("13","14","15", "16", "17", "18","19")), 
+aes(x=Drug, y=Frequency, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+teen_freq
+
+```
+
+### Young Adults (Frequency)
+
+```{r young adult freq, include=TRUE}
+young_adults_freq <- ggplot(subset(drug_filter_freq, Age %in% c("18","19","20","21","22-23","24-25")), 
+aes(x=Drug, y=Frequency, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+young_adults_freq
+```
+
+### Adults 26-49 (Frequency)
+
+```{r adult 26-49 freq, include=TRUE}
+adults_26_49_freq <- ggplot(subset(drug_filter_freq, Age %in% c("26-29","30-34","35-49")), 
+aes(x=Drug, y=Frequency, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+adults_26_49_freq
+```
+
+### Adults 50-65+ (Frequency)
+
+```{r adult 49-65+ freq, include=TRUE}
+adults_50_65_freq <- ggplot(subset(drug_filter_freq, Age %in% c("50-64","65+")), 
+aes(x=Drug, y=Frequency, fill=Age)) + geom_bar(stat="identity", position=position_dodge()) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+adults_50_65_freq
+```
