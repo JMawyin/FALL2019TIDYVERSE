@@ -300,3 +300,6 @@ forcats::fct_count()
 forcats::fct_recode()
 forcats::fct_relevel()
 
+## Part 2
+
+I appended a colorful boxplot to the end of "Tidyverse for Foul Ball data"" (Harris Dupre), which is described immediately above.
