@@ -252,3 +252,51 @@ cf. `DATA607_TidyVerse_Illien_Part1.Rmd`
 Part 2: Added dplyr separate to C. Rosemond's submission.
 
 cf. `DATA607_TidyVerse_Illien_Part2.Rmd`
+
+### dplyr_filter_select vignette
+
+Author: John Kellogg
+
+Part 1: Breaking down the operations in the Dplyr Filter and select operations
+file: dplyr_filter_select_kellogg.Rmd
+
+Part 2: Extended Amber Ferger's Tidyverse Assignment - Masculinity Data to include the summarize function and added to the Visualization section 
+file: Masculinity_Data.Rmd
+
+# Tidyverse for Foul Ball data (Harris Dupre)
+
+Part 1
+GitHub: https://github.com/hdupre/FALL2019TIDYVERSE
+Data: https://github.com/fivethirtyeight/data/tree/master/foul-balls
+Rpubs: https://rpubs.com/JumbledShark/557786
+
+## Dplyr functions used:
+* group_by() creates a group of column entries
+* summarize() allows calculations (such as mean and median) to be performed on a selected group.
+
+Part 2
+
+Extended code: "Tidy Verse AZ.rmd"
+* Added ggplots for more age groups, 26-49 and 40-65+.
+* filter() for frequency of usage rather than percent of population.
+* Added ggplots for median frequency of drug usage across all age groups.
+
+# Oxford Comma dataset from five-thirty-eight (Michael Y.)
+
+## Part 1
+Rpubs:  http://rpubs.com/myampol/Oxford-Comma-Tidyverse-Part-1
+Github: https://github.com/myampol/
+Data:  https://raw.githubusercontent.com/fivethirtyeight/data/master/comma-survey/comma-survey.csv
+
+The data contains mainly categorical variables, some of which are ordinal.  
+When loading the data, some work is needed to get these items properly loaded as factors, which will be displayed in the logical sequence for the ordinal items.  This requires recoding and releveling the variables, using functions available in forcats.
+
+## Tidyverse functions used:
+readr::read_csv()
+readr::spec_csv()
+dplyr::bind_cols()
+dplyr::rename_all()
+forcats::fct_count()
+forcats::fct_recode()
+forcats::fct_relevel()
+
