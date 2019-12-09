@@ -107,3 +107,14 @@ ggplot(rr.df.avg1, aes(x=reorder(factor(Country), Average, fun=median),y=Average
 ggplot(rr.df.avg1, aes(x=reorder(factor(Country), Average, fun=median),y=Average,fill=factor(Country))) + geom_boxplot() + labs(title="Average Ramen Ratings for Each Country") + ylab("Average Ratings") + theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x=element_text(angle=90, margin=margin(t = 10, r = 0, b = 0, l = 0)), plot.title = element_text(hjust=0.5))
 
 ```
+**Jose Mawyin Changes**
+
+>Below, we can see the power of using dplyr and the pipeline "%>%" to chain commands together. The following commands, counts the number of different options per brand of Ramen, arranges the brand in descending order (from most to less options) and finally selects only the top10 brands with the most options.
+
+>We can easily plot in increasing order the brands using ggplot
+
+```{r}
+most.options <- count(rr, Brand) %>% arrange( desc(n)) %>% top_n(10,n)
+c <- ggplot(most.options, aes(x=reorder(Brand, -n), y=n))
+c + geom_bar(stat = 'identity')  + coord_flip()
+```
